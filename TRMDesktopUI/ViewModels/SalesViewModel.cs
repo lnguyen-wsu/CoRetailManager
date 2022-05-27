@@ -42,6 +42,7 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
+        // Testing
 
 
         public string SubTotal

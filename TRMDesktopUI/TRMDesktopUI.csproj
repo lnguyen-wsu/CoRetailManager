@@ -87,6 +87,7 @@
     </ApplicationDefinition>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="Calculations.cs" />
+    <Compile Include="EventModels\LogOnEvent.cs" />
     <Compile Include="Helpers\PasswordBoxHelper.cs" />
     <Compile Include="ICalculations.cs" />
     <Compile Include="ViewModels\LoginViewModel.cs" />
