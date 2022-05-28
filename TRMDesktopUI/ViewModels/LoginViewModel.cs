@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using TRMDesktopUI.EventModels;
 using TRMDesktopUI.Helpers;
 using TRMDesktopUI.Library.Api;
 
@@ -18,9 +19,11 @@ namespace TRMDesktopUI.ViewModels
         private string _password;
         private IAPIHelper _apiHelper;
         private string _errorMessage;
-        public LoginViewModel(IAPIHelper apiHelper)
+        private IEventAggregator _events;   // Lesson 12b : Listening event and adding new param in constructor as well 
+        public LoginViewModel(IAPIHelper apiHelper , IEventAggregator events)
         {
             _apiHelper = apiHelper;
+            _events = events;               // Lesson 12b so now it can be used in this LoginViewModel
         }
         public string UserName
         {
@@ -81,6 +84,11 @@ namespace TRMDesktopUI.ViewModels
 
                 // Lesson 11C : Capture more info about the user
                 await _apiHelper.GetLoggedInUserInfo(result.Access_Token);
+                // if passing this stage, it meant user has successfully logged in 
+
+
+                // Lesson12b : publish event back to the UI thread
+                _events.PublishOnUIThread(new LogOnEvent());
             }
             catch (Exception ex)
             {
