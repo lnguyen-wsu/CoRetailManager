@@ -14,7 +14,7 @@ namespace TRMDataManager.Controllers
     {
 
         // Lesson 11B: Only testing the UserDataAccess we just make in the previous 
-           
+        [HttpGet]   
         public UserModel GetById()
         {        
             string userId = RequestContext.Principal.Identity.GetUserId(); // the current logging user 
