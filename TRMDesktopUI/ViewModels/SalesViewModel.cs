@@ -65,7 +65,7 @@ namespace TRMDesktopUI.ViewModels
         }
 
 
-        private int _itemQuantity;
+        private int _itemQuantity = 1;
 
         public int ItemQuantity
         {
@@ -118,17 +118,33 @@ namespace TRMDesktopUI.ViewModels
         }
 
         public void AddToCart () {
-            // Lesson 15C: Handle logic to get the selectedItem into this Cart           
-            CartItemModel item = new CartItemModel
-            {
-                Product = SelectedProduct,
-                QuantityInCart = ItemQuantity
-            };
-            // 15D: Logic of checking before adding to the cart
-
-            Cart.Add(item);
             //Lesson 15D
-            NotifyOfPropertyChange(() => SubTotal);
+            var existingITem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
+            if (existingITem != null)
+            {
+                existingITem.QuantityInCart += ItemQuantity;
+                //// hack- trick to update the displayText which should not be proper way to handle 
+                // There should be better way to do it 
+                Cart.Remove(existingITem);
+                Cart.Add(existingITem);
+            }
+            else
+            {
+                // Lesson 15C: Handle logic to get the selectedItem into this Cart           
+                CartItemModel item = new CartItemModel
+                {
+                    Product = SelectedProduct,
+                    QuantityInCart = ItemQuantity
+                };
+                // 15D: Logic of checking before adding to the cart
+
+                Cart.Add(item);
+            }
+            // set 
+            SelectedProduct.QuantityInStock -= ItemQuantity;
+            ItemQuantity = 1;
+            //end Lesson 15D
+            NotifyOfPropertyChange(() => SubTotal);          
         }
 
 
