@@ -50,12 +50,13 @@ namespace TRMDesktopUI.ViewModels
             set {
                 _selectedProduct = value;
                 NotifyOfPropertyChange(() => SelectedProduct);
+                NotifyOfPropertyChange(() => CanAddToCart);
             }
         }
 
-        private BindingList<ProductModel> _cart;
+        private BindingList<CartItemModel> _cart = new BindingList<CartItemModel>();       // Update it for Lesson15C
 
-        public BindingList<ProductModel> Cart
+        public BindingList<CartItemModel> Cart
         {
             get { return _cart; }
             set { _cart = value;
@@ -71,17 +72,22 @@ namespace TRMDesktopUI.ViewModels
             get { return _itemQuantity; }
             set { _itemQuantity = value;
                 NotifyOfPropertyChange(() => ItemQuantity);
+                NotifyOfPropertyChange(() => CanAddToCart);
             }
         }
 
         // Testing
 
-
+        // Lesson 15D: Add the logic to sum all the costs
         public string SubTotal
         {
             get {
-                // ToDo: Replace with Calculation
-                return "$0.00"; 
+                decimal subTotal = 0;
+                foreach (var item in Cart)
+                {
+                    subTotal += item.Product.RetailPrice * item.QuantityInCart;
+                }
+                return subTotal.ToString(); 
             }
         }
 
@@ -103,16 +109,28 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
-
+        // Lesson 15: Can Add To Cart logic
         public bool CanAddToCart { get {
-                //Todo: Making sure Something is selected
+                //Logic: Making sure Something is selected
                 //      Making sure there is an item quantity
-                return false;     
+                return (ItemQuantity > 0 && SelectedProduct?.QuantityInStock >= ItemQuantity);             
             } 
         }
 
-        public void AddToCart () { 
+        public void AddToCart () {
+            // Lesson 15C: Handle logic to get the selectedItem into this Cart           
+            CartItemModel item = new CartItemModel
+            {
+                Product = SelectedProduct,
+                QuantityInCart = ItemQuantity
+            };
+            // 15D: Logic of checking before adding to the cart
+
+            Cart.Add(item);
+            //Lesson 15D
+            NotifyOfPropertyChange(() => SubTotal);
         }
+
 
         public bool CanRemoveFromCart
         {
@@ -126,6 +144,8 @@ namespace TRMDesktopUI.ViewModels
 
         public void RemoveFromCart()
         {
+            //Lesson 15D
+            NotifyOfPropertyChange(() => SubTotal);
         }
 
         public bool CanCheckOut
