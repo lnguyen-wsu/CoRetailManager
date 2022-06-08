@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using TRMDesktopUI.Helpers;
 using TRMDesktopUI.Library.Api;
+using TRMDesktopUI.Library.Helpers;
 using TRMDesktopUI.Library.Models;
 using TRMDesktopUI.ViewModels;
 
@@ -41,6 +42,7 @@ namespace TRMDesktopUI
                 .Singleton<IEventAggregator, EventAggregator>()
                 // .Singleton<LoggedInUserModel>()      ==> one way to handle the returned of GetLoggedInUserInfo
                 .Singleton<ILoggedInUserModel,LoggedInUserModel>()
+                .Singleton<IConfigHelper, ConfigHelper>()
                 .Singleton<IAPIHelper, APIHelper>();
 
             // Lesson 5b: Affer added ICalculations

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TRMDesktopUI.Library.Api;
+using TRMDesktopUI.Library.Helpers;
 using TRMDesktopUI.Library.Models;
 
 namespace TRMDesktopUI.ViewModels
@@ -14,9 +15,11 @@ namespace TRMDesktopUI.ViewModels
     {
         // Lesson 14B
         IProductEndPoint _productEndpoint;
-        public SalesViewModel(IProductEndPoint productEndPoint)
+        IConfigHelper _configHelper;
+        public SalesViewModel(IProductEndPoint productEndPoint, IConfigHelper configHelper)
         {
-            _productEndpoint = productEndPoint;         
+            _productEndpoint = productEndPoint;
+            _configHelper = configHelper;
         }
         private async Task LoadProducts()
         {
@@ -81,31 +84,46 @@ namespace TRMDesktopUI.ViewModels
         // Lesson 15D: Add the logic to sum all the costs
         public string SubTotal
         {
-            get {
-                decimal subTotal = 0;
+            get {                           
+                return CalculateSubTotal().ToString("C"); 
+            }
+        }
+        private decimal CalculateSubTotal()
+        {
+             decimal subTotal = 0;
                 foreach (var item in Cart)
                 {
                     subTotal += item.Product.RetailPrice * item.QuantityInCart;
                 }
-                return subTotal.ToString(); 
-            }
+            return subTotal;
         }
-
+        private decimal CalculateTax()
+        {
+            decimal taxAmount = 0;
+                var taxRate = (decimal)_configHelper.GetTaxRate();
+                foreach (var item in Cart)
+                {
+                    if (item.Product.IsTaxable)
+                    {
+                        taxAmount += (item.Product.RetailPrice * item.QuantityInCart * taxRate); 
+                    }
+                }
+                return Decimal.Round(taxAmount/100);
+        }
+        // Lesson 16A: Added the logic of Tax
         public string Tax
         {
             get
-            {
-                // ToDo: Replace with Calculation
-                return "$0.00";
+            {             
+                return CalculateTax().ToString("C");              
             }
         }
 
         public string Total
         {
             get
-            {
-                // ToDo: Replace with Calculation
-                return "$0.00";
+            {               
+                return (CalculateTax() + CalculateTax()).ToString("C");
             }
         }
 
@@ -144,7 +162,9 @@ namespace TRMDesktopUI.ViewModels
             SelectedProduct.QuantityInStock -= ItemQuantity;
             ItemQuantity = 1;
             //end Lesson 15D
-            NotifyOfPropertyChange(() => SubTotal);          
+            NotifyOfPropertyChange(() => SubTotal);  
+            NotifyOfPropertyChange(() => Total);   
+            NotifyOfPropertyChange(() => Tax);   
         }
 
 
@@ -162,6 +182,8 @@ namespace TRMDesktopUI.ViewModels
         {
             //Lesson 15D
             NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Total);   
+            NotifyOfPropertyChange(() => Tax);  
         }
 
         public bool CanCheckOut
