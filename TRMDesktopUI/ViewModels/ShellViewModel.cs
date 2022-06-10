@@ -15,19 +15,17 @@ namespace TRMDesktopUI.ViewModels
     {
         
         private IEventAggregator _events;   // Lesson 13c :Adding IHandle<LogOnEvent> and IEventAggregator
-        private SalesViewModel _salesVM;    // Lesson 13c : after the listening correct event, open sale windows
-        private SimpleContainer _container;
-        public ShellViewModel( IEventAggregator events, SalesViewModel salesVM, SimpleContainer container)
+        private SalesViewModel _salesVM;    // Lesson 13c : after the listening correct event, open sale windows     
+        public ShellViewModel( IEventAggregator events, SalesViewModel salesVM)
         {
-            // section 13c : modified
-            _container = container;
+            // section 13c : modified      
             _events = events;        
             _salesVM = salesVM;
             _events.Subscribe(this);
            
             // end section13c
            
-            ActivateItem(_container.GetInstance<LoginViewModel>());    // Solution for LoginViewModel : Create new Instance LoginViewModel after successfully logged in so that user credential is not saved
+            ActivateItem(IoC.Get<LoginViewModel>());    // Solution for LoginViewModel : Create new Instance LoginViewModel after successfully logged in so that user credential is not saved
         }
 
         // Lesson 13 c: Listen event from the event LoginViewModel
