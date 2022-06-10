@@ -36,7 +36,19 @@
             <!--lesson14C - Binding to display Sales Products-->
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding ProductName}" />
+                    <StackPanel Orientation="Vertical" >
+                        <TextBlock Text="{Binding ProductName}" />
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Price: " FontSize="15"/>
+                                <TextBlock Text="{Binding RetailPrice , StringFormat='{}{0:C}'}" FontSize="15"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="5 0 0 0">
+                                <TextBlock Text="Qty: " FontSize="15"/>
+                                <TextBlock Text="{Binding QuantityInStock}" FontSize="15" />
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
