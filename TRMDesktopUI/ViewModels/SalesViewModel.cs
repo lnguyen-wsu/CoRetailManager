@@ -98,16 +98,11 @@ namespace TRMDesktopUI.ViewModels
             return subTotal;
         }
         private decimal CalculateTax()
-        {
-            decimal taxAmount = 0;
+        {              
                 var taxRate = (decimal)_configHelper.GetTaxRate();
-                foreach (var item in Cart)
-                {
-                    if (item.Product.IsTaxable)
-                    {
-                        taxAmount += (item.Product.RetailPrice * item.QuantityInCart * taxRate); 
-                    }
-                }
+                decimal taxAmount = Cart.Where(x => x.Product.IsTaxable)
+                                        .Sum(x => x.Product.RetailPrice * x.QuantityInCart * taxRate);
+               
                 return Decimal.Round(taxAmount/100);
         }
         // Lesson 16A: Added the logic of Tax
