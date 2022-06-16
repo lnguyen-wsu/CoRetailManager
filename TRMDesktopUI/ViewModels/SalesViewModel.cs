@@ -16,10 +16,12 @@ namespace TRMDesktopUI.ViewModels
         // Lesson 14B
         IProductEndPoint _productEndpoint;
         IConfigHelper _configHelper;
-        public SalesViewModel(IProductEndPoint productEndPoint, IConfigHelper configHelper)
+        ISaleEndPoint _saleEndpoint;
+        public SalesViewModel(IProductEndPoint productEndPoint, IConfigHelper configHelper, ISaleEndPoint saleEndPoint)
         {
             _productEndpoint = productEndPoint;
             _configHelper = configHelper;
+            _saleEndpoint = saleEndPoint;
         }
         private async Task LoadProducts()
         {
@@ -64,6 +66,7 @@ namespace TRMDesktopUI.ViewModels
             get { return _cart; }
             set { _cart = value;
                 NotifyOfPropertyChange(() => Cart);
+                NotifyOfPropertyChange(() => CanCheckOut);
             }
         }
 
@@ -76,6 +79,7 @@ namespace TRMDesktopUI.ViewModels
             set { _itemQuantity = value;
                 NotifyOfPropertyChange(() => ItemQuantity);
                 NotifyOfPropertyChange(() => CanAddToCart);
+                
             }
         }
 
@@ -136,7 +140,7 @@ namespace TRMDesktopUI.ViewModels
             if (existingITem != null)
             {
                 existingITem.QuantityInCart += ItemQuantity;
-                //// hack- trick to update the displayText which should not be proper way to handle 
+                // hack- trick to update the displayText which should not be proper way to handle 
                 // There should be better way to do it 
                 Cart.Remove(existingITem);
                 Cart.Add(existingITem);
@@ -159,7 +163,8 @@ namespace TRMDesktopUI.ViewModels
             //end Lesson 15D
             NotifyOfPropertyChange(() => SubTotal);  
             NotifyOfPropertyChange(() => Total);   
-            NotifyOfPropertyChange(() => Tax);   
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => CanCheckOut);
         }
 
 
@@ -177,22 +182,33 @@ namespace TRMDesktopUI.ViewModels
         {
             //Lesson 15D
             NotifyOfPropertyChange(() => SubTotal);
-            NotifyOfPropertyChange(() => Total);   
-            NotifyOfPropertyChange(() => Tax);  
+            NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => CanCheckOut);
         }
 
         public bool CanCheckOut
         {
             get
             {
-                //Todo: Making sure there is something in the cart 
-
-                return false;
+                return Cart.Count > 0 ? true : false;
             }
         }
 
-        public void CheckOut()
+        public async Task CheckOut()
         {
+            // Create saleModel and post to API
+            var sale = new SaleModel();
+            foreach (var item in Cart)
+            {
+                sale.SaleDetails.Add(new SaleDetailModel
+                {
+                    ProductId = item.Product.Id,
+                    Quantity = item.QuantityInCart
+                });                            
+            }
+            // Now we have to post it to API
+            await _saleEndpoint.PostSale(sale);
         }
 
 
