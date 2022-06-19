@@ -57,12 +57,28 @@ namespace TRMDesktopUI.ViewModels
         public ProductDisplayModel SelectedProduct
         {
             get { return _selectedProduct; }
-            set {
+            set
+            {
                 _selectedProduct = value;
                 NotifyOfPropertyChange(() => SelectedProduct);
-                NotifyOfPropertyChange(() => CanAddToCart);
+                NotifyOfPropertyChange(() => CanAddToCart);              
             }
         }
+
+
+
+        private CartItemDisplayModel _selectedCartItem;
+
+        public CartItemDisplayModel SelectedCartItem
+        {
+            get { return _selectedCartItem; }
+            set {
+                _selectedCartItem = value;
+                NotifyOfPropertyChange(() => SelectedCartItem);
+                NotifyOfPropertyChange(() => CanRemoveFromCart);
+            }
+        }
+
 
         private BindingList<CartItemDisplayModel> _cart = new BindingList<CartItemDisplayModel>();       // Update it for Lesson15C
 
@@ -175,13 +191,23 @@ namespace TRMDesktopUI.ViewModels
             get
             {
                 //Todo: Making sure Something is selected
-               
-                return false;
+
+                return SelectedCartItem != null && SelectedCartItem?.Product.QuantityInStock > 0;
             }
         }
 
         public void RemoveFromCart()
         {
+            SelectedCartItem.Product.QuantityInStock += 1;
+            if (SelectedCartItem.QuantityInCart > 1)
+            {
+                SelectedCartItem.QuantityInCart -= 1;              
+            }
+            else
+            {
+                Cart.Remove(SelectedCartItem);
+            }
+            
             //Lesson 15D
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Total);
