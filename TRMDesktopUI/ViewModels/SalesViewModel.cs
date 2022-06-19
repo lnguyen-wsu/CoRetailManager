@@ -1,4 +1,5 @@
-﻿using Caliburn.Micro;
+﻿using AutoMapper;
+using Caliburn.Micro;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 using TRMDesktopUI.Library.Api;
 using TRMDesktopUI.Library.Helpers;
 using TRMDesktopUI.Library.Models;
+using TRMDesktopUI.Models;
 
 namespace TRMDesktopUI.ViewModels
 {
@@ -17,16 +19,19 @@ namespace TRMDesktopUI.ViewModels
         IProductEndPoint _productEndpoint;
         IConfigHelper _configHelper;
         ISaleEndPoint _saleEndpoint;
-        public SalesViewModel(IProductEndPoint productEndPoint, IConfigHelper configHelper, ISaleEndPoint saleEndPoint)
+        IMapper _mapper; 
+        public SalesViewModel(IProductEndPoint productEndPoint, IConfigHelper configHelper, ISaleEndPoint saleEndPoint , IMapper mapper)
         {
             _productEndpoint = productEndPoint;
             _configHelper = configHelper;
             _saleEndpoint = saleEndPoint;
+            _mapper = mapper;
         }
         private async Task LoadProducts()
         {
             var productList = await _productEndpoint.GetAll();
-            Products = new BindingList<ProductModel>(productList);
+            var products = _mapper.Map<List<ProductDisplayModel>>(productList);
+            Products = new BindingList<ProductDisplayModel>(products);
         }
 
         protected override async void OnViewLoaded(object view)
@@ -36,9 +41,9 @@ namespace TRMDesktopUI.ViewModels
         }
 
         // end session here
-        private BindingList<ProductModel> _products;
+        private BindingList<ProductDisplayModel> _products;
 
-        public BindingList<ProductModel> Products
+        public BindingList<ProductDisplayModel> Products
         {
             get { return _products; }
             set { _products = value; 
@@ -47,9 +52,9 @@ namespace TRMDesktopUI.ViewModels
         }
 
         // lesson 15A: get selected item
-        private ProductModel _selectedProduct;
+        private ProductDisplayModel _selectedProduct;
 
-        public ProductModel SelectedProduct
+        public ProductDisplayModel SelectedProduct
         {
             get { return _selectedProduct; }
             set {
@@ -59,9 +64,9 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
-        private BindingList<CartItemModel> _cart = new BindingList<CartItemModel>();       // Update it for Lesson15C
+        private BindingList<CartItemDisplayModel> _cart = new BindingList<CartItemDisplayModel>();       // Update it for Lesson15C
 
-        public BindingList<CartItemModel> Cart
+        public BindingList<CartItemDisplayModel> Cart
         {
             get { return _cart; }
             set { _cart = value;
@@ -140,15 +145,12 @@ namespace TRMDesktopUI.ViewModels
             if (existingITem != null)
             {
                 existingITem.QuantityInCart += ItemQuantity;
-                // hack- trick to update the displayText which should not be proper way to handle 
-                // There should be better way to do it 
-                Cart.Remove(existingITem);
-                Cart.Add(existingITem);
+                
             }
             else
             {
                 // Lesson 15C: Handle logic to get the selectedItem into this Cart           
-                CartItemModel item = new CartItemModel
+                CartItemDisplayModel item = new CartItemDisplayModel
                 {
                     Product = SelectedProduct,
                     QuantityInCart = ItemQuantity
