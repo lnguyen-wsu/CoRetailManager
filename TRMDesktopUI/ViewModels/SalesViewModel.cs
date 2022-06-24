@@ -66,6 +66,17 @@ namespace TRMDesktopUI.ViewModels
         }
 
 
+        private async Task ResetSalesViewModel()
+        {
+            Cart = new BindingList<CartItemDisplayModel>();
+            //TODO- Add clearing the selectedCartItem if it does not do itself
+            await LoadProducts();  // After post Database data will be updated quantity, this loadProduct should get the most updated
+            
+            NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => CanCheckOut);
+        }
 
         private CartItemDisplayModel _selectedCartItem;
 
@@ -192,7 +203,7 @@ namespace TRMDesktopUI.ViewModels
             {
                 //Todo: Making sure Something is selected
 
-                return SelectedCartItem != null && SelectedCartItem?.Product.QuantityInStock > 0;
+                return SelectedCartItem != null && SelectedCartItem?.QuantityInCart > 0;
             }
         }
 
@@ -213,6 +224,7 @@ namespace TRMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => Total);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => CanCheckOut);
+            NotifyOfPropertyChange(() => CanAddToCart);
         }
 
         public bool CanCheckOut
@@ -237,6 +249,8 @@ namespace TRMDesktopUI.ViewModels
             }
             // Now we have to post it to API
             await _saleEndpoint.PostSale(sale);
+
+            await ResetSalesViewModel();
         }
 
 
