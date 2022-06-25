@@ -79,11 +79,7 @@ namespace TRMDataManagerLibrary.DataAccess
                     throw;
                 }
 
-            }
-                
-
-            
-           
+            }                           
         }
 
 
