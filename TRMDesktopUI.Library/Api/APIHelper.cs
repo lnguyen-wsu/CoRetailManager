@@ -65,6 +65,10 @@ namespace TRMDesktopUI.Library.Api
             }
         }
 
+        public void LogOffUser()
+        {
+            _apiClient.DefaultRequestHeaders.Clear();
+        }
         //Lesson11B - Internal Data Helper method to get the userInfo 
         public async Task GetLoggedInUserInfo(string token)
         {

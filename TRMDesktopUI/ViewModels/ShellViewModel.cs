@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TRMDesktopUI.EventModels;
+using TRMDesktopUI.Library.Api;
 using TRMDesktopUI.Library.Models;
 
 namespace TRMDesktopUI.ViewModels
@@ -17,13 +18,15 @@ namespace TRMDesktopUI.ViewModels
         
         private IEventAggregator _events;   // Lesson 13c :Adding IHandle<LogOnEvent> and IEventAggregator
         private SalesViewModel _salesVM;    // Lesson 13c : after the listening correct event, open sale windows
-        private ILoggedInUserModel _user;                               
-        public ShellViewModel( IEventAggregator events, SalesViewModel salesVM ,  ILoggedInUserModel user)
+        private ILoggedInUserModel _user;
+        private IAPIHelper _apiHelper;
+        public ShellViewModel( IEventAggregator events, SalesViewModel salesVM ,  ILoggedInUserModel user , IAPIHelper aPIHelper)
         {
             // section 13c : modified      
             _events = events;        
             _salesVM = salesVM;
             _user = user;
+            _apiHelper = aPIHelper;
             _events.Subscribe(this);
            
             // end section13c
@@ -45,8 +48,9 @@ namespace TRMDesktopUI.ViewModels
         }
         public void LogOut()
         {
-            _user.LogOffUser();
-            ActivateItem(IoC.Get<LoginViewModel>());
+            _user.ResetUserModel();
+            _apiHelper.LogOffUser();
+            ActivateItem(IoC.Get<LoginViewModel>());          
             NotifyOfPropertyChange(() => IsLoggedIn);
         }
         // Lesson 13 c: Listen event from the event LoginViewModel
