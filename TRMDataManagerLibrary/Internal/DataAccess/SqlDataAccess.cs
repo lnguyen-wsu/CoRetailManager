@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace TRMDataManagerLibrary.Internal.DataAccess
 {
-    internal class SqlDataAccess
+    internal class SqlDataAccess : IDisposable
     {
         public string GetConnectionString(string name) => ConfigurationManager.ConnectionStrings[name].ConnectionString;
 
@@ -37,6 +37,53 @@ namespace TRMDataManagerLibrary.Internal.DataAccess
                     commandType: CommandType.StoredProcedure);                
             }
         }
+        // lesson 21A: Open SQL transaction in the C#
+        private IDbConnection _connection;
+        private IDbTransaction _transaction;
+        public void StartTransaction (string connectionStringName)
+        {
+            _connection = new SqlConnection(GetConnectionString(connectionStringName));
+            _connection.Open();
+            _transaction = _connection.BeginTransaction();
+        }
+
+        public void SaveDataInTransaction<T>(string storedProcedure, T parameters)
+        {                    
+                _connection.Query<T>(storedProcedure, parameters,
+                    commandType: CommandType.StoredProcedure, transaction:_transaction);
+           
+        }
+        public List<T> LoadDataInTransaction<T, U>(string storedProcedure, U parameters)
+        {
+           
+                // using dapper to load data 
+                // It means Get the connection to database
+                List<T> rows = _connection.Query<T>(storedProcedure, parameters,
+                    commandType: CommandType.StoredProcedure , transaction:_transaction).ToList();
+                return rows;
+         
+        }
+
+        public void CommitTransaction()
+        {
+            _transaction?.Commit();
+            _connection?.Close();
+        }
+        public void RollbackTransaction()
+        {
+            _transaction?.Rollback();
+            _connection?.Close();
+        }
+
+        public void Dispose()
+        {
+            CommitTransaction();
+        }
+        // Open connect/Start transaction method
+        // Load using the transaction 
+        // Saave using the transaction 
+        // CLoe connection/stop transaction method
+        // Dispose
 
     }
 }
