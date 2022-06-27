@@ -82,13 +82,13 @@ namespace TRMDataManagerLibrary.DataAccess
             }                           
         }
 
+        // Lesson 22: Get Sale Report Model
+        public List<SaleReportModel> GetSaleReport()
+        {
+            SqlDataAccess sql = new SqlDataAccess();
+            var output = sql.LoadData<SaleReportModel, dynamic>("dbo.spSale_SaleReport", new { }, "TRMData");
+            return output;
+        }
 
-        //public List<ProductModel> GetProducts()
-        //{
-        //    SqlDataAccess sql = new SqlDataAccess();
-        //    var p = new { };    // Anonymous Object 
-        //    var output = sql.LoadData<ProductModel, dynamic>("dbo.spProduct_GetAll", p, "TRMData");
-        //    return output;
-        //}
     }
 }

@@ -20,11 +20,15 @@ namespace TRMDataManager.Controllers
             string userId = RequestContext.Principal.Identity.GetUserId();
             data.SaveSale(sale,userId);
         }
-        //public List<ProductModel> Get()
-        //{
-        //    ProductData data = new ProductData();
-        //    var result = data.GetProducts();
-        //    return result;
-        //}
+        
+
+        // lesson 22a
+        [Route("GetSalesReport")]
+        public List<SaleReportModel> GetSalesReport()
+        {
+            SaleData data = new SaleData();
+            var result = data.GetSaleReport();
+            return result;
+        }
     }
 }
