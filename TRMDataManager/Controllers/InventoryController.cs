@@ -12,6 +12,7 @@ namespace TRMDataManager.Controllers
     [Authorize]
     public class InventoryController : ApiController
     {
+        [Authorize(Roles = "Admin,Manager")]
         public List<InventoryModel> Get()
         {
             InventoryData data = new InventoryData();
@@ -19,8 +20,16 @@ namespace TRMDataManager.Controllers
             return result;
         }
 
+        [Authorize(Roles = "Admin")]
         public void Post(InventoryModel item)
         {
+            //if (RequestContext.Principal.IsInRole("Admin"))
+            //{
+            //    // Do admin stuff
+            //}else if (RequestContext.Principal.IsInRole("Manager"))
+            //{
+            //    // Do Manager stuff
+            //}
             InventoryData data = new InventoryData();
             data.SaveInventoryRecord(item);
         }
