@@ -30,8 +30,9 @@ namespace TRMDesktopUI.Library.Api
         }
         private void InitializeClient()
         {
+            string address = ConfigurationManager.AppSettings["api"];        
             _apiClient = new HttpClient();
-            _apiClient.BaseAddress = new Uri(ConfigurationManager.AppSettings["api"]);
+            _apiClient.BaseAddress = new Uri(address);
             _apiClient.DefaultRequestHeaders.Accept.Clear();
             _apiClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
         }
