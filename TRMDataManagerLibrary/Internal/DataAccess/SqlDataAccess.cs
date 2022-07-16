@@ -16,7 +16,7 @@ namespace TRMDataManagerLibrary.Internal.DataAccess
 
         // After Installed Dapper ==> Lesson 11A : Set up and Load Data
         public List<T> LoadData<T,U> (string storedProcedure, U parameters, string connectionStringName)
-        {
+        {         
             using (IDbConnection connection = new SqlConnection(GetConnectionString(connectionStringName)))
             {
                 // using dapper to load data 
