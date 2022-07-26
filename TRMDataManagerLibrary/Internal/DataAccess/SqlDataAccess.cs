@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -12,7 +13,14 @@ namespace TRMDataManagerLibrary.Internal.DataAccess
 {
     internal class SqlDataAccess : IDisposable
     {
-        public string GetConnectionString(string name) => ConfigurationManager.ConnectionStrings[name].ConnectionString;
+        private readonly IConfiguration _config;
+        public SqlDataAccess(IConfiguration config)
+        {
+            this._config = config;
+        }
+
+        // ConfigurationManager.ConnectionStrings[name].ConnectionString;
+        public string GetConnectionString(string name) => _config.GetConnectionString(name);
 
         // After Installed Dapper ==> Lesson 11A : Set up and Load Data
         public List<T> LoadData<T,U> (string storedProcedure, U parameters, string connectionStringName)
@@ -66,6 +74,7 @@ namespace TRMDataManagerLibrary.Internal.DataAccess
         }
 
         private bool isClosed = false;
+        
 
         public void CommitTransaction()
         {
