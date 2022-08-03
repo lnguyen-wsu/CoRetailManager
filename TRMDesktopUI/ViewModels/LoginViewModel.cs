@@ -16,7 +16,7 @@ namespace TRMDesktopUI.ViewModels
         #region Setting up the properties base on the LoginView.xaml - Wiring up the value the View to backend
 
         private string _userName = "abc@gmail.com";
-        private string _password = "Test@1234";
+        private string _password = "Abcd@1234"; // Test@1234
         private IAPIHelper _apiHelper;
         private string _errorMessage;
         private IEventAggregator _events;   // Lesson 12b : Listening event and adding new param in constructor as well 

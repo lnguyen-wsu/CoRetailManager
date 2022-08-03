@@ -25,6 +25,7 @@ namespace TRMApi.Controllers
             this._config = config;
         }
         [Authorize(Roles = "Cashier")]
+        [HttpPost]
         // This method is post from the UI ==> Post to API ==> post to the database
         public void Post(SaleModel sale)
         {
@@ -38,6 +39,7 @@ namespace TRMApi.Controllers
         // lesson 22a
         [Authorize(Roles = "Admin,Manager")]
         [Route("GetSalesReport")]
+        [HttpGet]
         public List<SaleReportModel> GetSalesReport()
         {
             SaleData data = new SaleData(_config);
