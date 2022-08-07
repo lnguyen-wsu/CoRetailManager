@@ -88,7 +88,7 @@ namespace TRMDesktopUI.ViewModels
 
 
                 // Lesson12b : publish event back to the UI thread
-                _events.PublishOnUIThread(new LogOnEvent());
+                await _events.PublishOnUIThreadAsync(new LogOnEvent(), new System.Threading.CancellationToken());
             }
             catch (Exception ex)
             {

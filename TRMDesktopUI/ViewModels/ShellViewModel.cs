@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TRMDesktopUI.EventModels;
 using TRMDesktopUI.Library.Api;
@@ -27,11 +28,11 @@ namespace TRMDesktopUI.ViewModels
             _salesVM = salesVM;
             _user = user;
             _apiHelper = aPIHelper;
-            _events.Subscribe(this);
+            _events.SubscribeOnPublishedThread(this);
            
             // end section13c
            
-            ActivateItem(IoC.Get<LoginViewModel>());    // Solution for LoginViewModel : Create new Instance LoginViewModel after successfully logged in so that user credential is not saved
+            ActivateItemAsync(IoC.Get<LoginViewModel>(), new CancellationToken());    // Solution for LoginViewModel : Create new Instance LoginViewModel after successfully logged in so that user credential is not saved
         }
 
         public bool IsLoggedIn
@@ -44,28 +45,34 @@ namespace TRMDesktopUI.ViewModels
 
         public void ExitApplication()
         {
-            TryClose();         
+            TryCloseAsync();         
         }
 
-        public void UserManagement()
+        public async Task UserManagement()
         {
-            ActivateItem(IoC.Get<UserDisplayViewModel>());         
+            await ActivateItemAsync(IoC.Get<UserDisplayViewModel>() , new CancellationToken());         
         }
-        public void LogOut()
+        public async Task LogOut()
         {
             _user.ResetUserModel();
             _apiHelper.LogOffUser();
-            ActivateItem(IoC.Get<LoginViewModel>());          
+            await ActivateItemAsync(IoC.Get<LoginViewModel>(), new CancellationToken());          
             NotifyOfPropertyChange(() => IsLoggedIn);
         }
         // Lesson 13 c: Listen event from the event LoginViewModel
-        public void Handle(LogOnEvent message)
+        //public void Handle(LogOnEvent message)
+        //{
+        //    ActivateItem(_salesVM);
+        //    // When it activate saleVM, the sales windows will show up but problem is that 
+        //    // the login windows will be behind but still have user's credential there 
+        //    // we need to fix it ==> The fix has been mentioned as the contructor
+        //    // For the saleView we want to store anything in it, since user can come back and edit them any time
+        //    NotifyOfPropertyChange(() => IsLoggedIn);
+        //}
+
+        public async Task HandleAsync(LogOnEvent message, CancellationToken cancellationToken)
         {
-            ActivateItem(_salesVM);
-            // When it activate saleVM, the sales windows will show up but problem is that 
-            // the login windows will be behind but still have user's credential there 
-            // we need to fix it ==> The fix has been mentioned as the contructor
-            // For the saleView we want to store anything in it, since user can come back and edit them any time
+            await ActivateItemAsync(_salesVM , cancellationToken);           
             NotifyOfPropertyChange(() => IsLoggedIn);
         }
     }
