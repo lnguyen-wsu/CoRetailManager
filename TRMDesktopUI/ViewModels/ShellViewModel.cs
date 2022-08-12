@@ -17,15 +17,15 @@ namespace TRMDesktopUI.ViewModels
     public class ShellViewModel: Conductor<object> , IHandle<LogOnEvent>
     {
         
-        private IEventAggregator _events;   // Lesson 13c :Adding IHandle<LogOnEvent> and IEventAggregator
-        private SalesViewModel _salesVM;    // Lesson 13c : after the listening correct event, open sale windows
+        private IEventAggregator _events;   // Lesson 13c :Adding IHandle<LogOnEvent> and IEventAggregator      
         private ILoggedInUserModel _user;
         private IAPIHelper _apiHelper;
-        public ShellViewModel( IEventAggregator events, SalesViewModel salesVM ,  ILoggedInUserModel user , IAPIHelper aPIHelper)
+        public ShellViewModel(IEventAggregator events,                           
+                              ILoggedInUserModel user,
+                              IAPIHelper aPIHelper)
         {
             // section 13c : modified      
-            _events = events;        
-            _salesVM = salesVM;
+            _events = events;                   
             _user = user;
             _apiHelper = aPIHelper;
             _events.SubscribeOnPublishedThread(this);
@@ -59,20 +59,11 @@ namespace TRMDesktopUI.ViewModels
             await ActivateItemAsync(IoC.Get<LoginViewModel>(), new CancellationToken());          
             NotifyOfPropertyChange(() => IsLoggedIn);
         }
-        // Lesson 13 c: Listen event from the event LoginViewModel
-        //public void Handle(LogOnEvent message)
-        //{
-        //    ActivateItem(_salesVM);
-        //    // When it activate saleVM, the sales windows will show up but problem is that 
-        //    // the login windows will be behind but still have user's credential there 
-        //    // we need to fix it ==> The fix has been mentioned as the contructor
-        //    // For the saleView we want to store anything in it, since user can come back and edit them any time
-        //    NotifyOfPropertyChange(() => IsLoggedIn);
-        //}
+        
 
         public async Task HandleAsync(LogOnEvent message, CancellationToken cancellationToken)
         {
-            await ActivateItemAsync(_salesVM , cancellationToken);           
+            await ActivateItemAsync(IoC.Get<SalesViewModel>(), cancellationToken);           
             NotifyOfPropertyChange(() => IsLoggedIn);
         }
     }
