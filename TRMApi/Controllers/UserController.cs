@@ -24,12 +24,13 @@ namespace TRMApi.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _config;
+        private readonly IUserData _userData;
 
-      
-        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IConfiguration config)
+        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IConfiguration config, IUserData userData)
         {
             this._context = context;
             this._config = config;
+            this._userData = userData;
             this._userManager = userManager;
         }
         // Lesson 11B: Only testing the UserDataAccess we just make in the previous 
@@ -38,8 +39,8 @@ namespace TRMApi.Controllers
         {
             // Old way: //string userId = RequestContext.Principal.Identity.GetUserId();
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier); 
-            UserData data = new UserData(_config);
-            var result = data.GetUserById(userId)?.First();
+            
+            var result = _userData.GetUserById(userId)?.First();
             if (result != null) { result.Id = userId; }
             return result;
         }
@@ -64,11 +65,7 @@ namespace TRMApi.Controllers
                         Id = user.Id,
                         Email = user.Email
                     };
-                u.Roles = userRoles.Where(x => x.UserId == u.Id).ToDictionary(key => key.RoleId, val => val.Name);
-                //foreach (var r in user.Roles)
-                //{
-                //    u.Roles.Add(r.RoleId, roles.Where(x => x.Id == r.RoleId).First().Name);
-                //}
+                u.Roles = userRoles.Where(x => x.UserId == u.Id).ToDictionary(key => key.RoleId, val => val.Name);             
                 output.Add(u);
                 }
                 return output;        

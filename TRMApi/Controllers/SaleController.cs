@@ -17,22 +17,21 @@ namespace TRMApi.Controllers
     [Authorize]
     public class SaleController : ControllerBase
     {
+        private readonly ISaleData _saleData;
 
-        private readonly IConfiguration _config;
-
-        public SaleController(IConfiguration config)
+        public SaleController(ISaleData saleData)
         {
-            this._config = config;
+            this._saleData = saleData;
         }
         [Authorize(Roles = "Cashier")]
         [HttpPost]
         // This method is post from the UI ==> Post to API ==> post to the database
         public void Post(SaleModel sale)
         {
-            SaleData data = new SaleData(_config);
+          
             //string userId = RequestContext.Principal.Identity.GetUserId();
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            data.SaveSale(sale, userId);
+            _saleData.SaveSale(sale, userId);
         }
 
 
@@ -42,8 +41,7 @@ namespace TRMApi.Controllers
         [HttpGet]
         public List<SaleReportModel> GetSalesReport()
         {
-            SaleData data = new SaleData(_config);
-            var result = data.GetSaleReport();
+            var result = _saleData.GetSaleReport();
             return result;
         }
     }

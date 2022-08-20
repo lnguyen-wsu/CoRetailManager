@@ -9,21 +9,20 @@ using TRMDataManagerLibrary.Models;
 
 namespace TRMDataManagerLibrary.DataAccess
 {
-    public class UserData
+    public class UserData : IUserData
     {
-        private readonly IConfiguration _config;
+        private readonly IUserData _userData;
+        private readonly ISqlDataAccess _sql;
 
-        public UserData(IConfiguration config)
-        {
-            this._config = config;
+        public UserData( ISqlDataAccess sql)
+        {         
+            this._sql = sql;
         }
         // Lesson 11B: Making Back end on method using the stored procedure by SqlDataAccess
-        public List<UserModel> GetUserById (string Id)
+        public List<UserModel> GetUserById(string Id)
         {
-            // This is not the best way to code directly but in the future it will be changed 
-            SqlDataAccess sql = new SqlDataAccess(_config);
-            var p = new { Id };    // Anonymous Object 
-            var output = sql.LoadData<UserModel, dynamic>("dbo.spUserLookup", p, "TRMData");         
+            // This is not the best way to code directly but in the future it will be changed                  
+            var output = _sql.LoadData<UserModel, dynamic>("dbo.spUserLookup", new { Id }, "TRMData");
             return output;
         }
     }

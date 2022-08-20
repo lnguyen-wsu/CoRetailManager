@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace TRMDataManagerLibrary.Internal.DataAccess
 {
-    internal class SqlDataAccess : IDisposable
+    public class SqlDataAccess : IDisposable, ISqlDataAccess
     {
         private readonly IConfiguration _config;
         public SqlDataAccess(IConfiguration config)
@@ -23,13 +23,13 @@ namespace TRMDataManagerLibrary.Internal.DataAccess
         public string GetConnectionString(string name) => _config.GetConnectionString(name);
 
         // After Installed Dapper ==> Lesson 11A : Set up and Load Data
-        public List<T> LoadData<T,U> (string storedProcedure, U parameters, string connectionStringName)
-        {         
+        public List<T> LoadData<T, U>(string storedProcedure, U parameters, string connectionStringName)
+        {
             using (IDbConnection connection = new SqlConnection(GetConnectionString(connectionStringName)))
             {
                 // using dapper to load data 
                 // It means Get the connection to database
-                List<T> rows = connection.Query<T>(storedProcedure, parameters, 
+                List<T> rows = connection.Query<T>(storedProcedure, parameters,
                     commandType: CommandType.StoredProcedure).ToList();
                 return rows;
             }
@@ -42,13 +42,13 @@ namespace TRMDataManagerLibrary.Internal.DataAccess
                 // using dapper to load data 
                 // It means Get the connection to database
                 connection.Query<T>(storedProcedure, parameters,
-                    commandType: CommandType.StoredProcedure);                
+                    commandType: CommandType.StoredProcedure);
             }
         }
         // lesson 21A: Open SQL transaction in the C#
         private IDbConnection _connection;
         private IDbTransaction _transaction;
-        public void StartTransaction (string connectionStringName)
+        public void StartTransaction(string connectionStringName)
         {
             _connection = new SqlConnection(GetConnectionString(connectionStringName));
             _connection.Open();
@@ -57,24 +57,24 @@ namespace TRMDataManagerLibrary.Internal.DataAccess
         }
 
         public void SaveDataInTransaction<T>(string storedProcedure, T parameters)
-        {                    
-                _connection.Query<T>(storedProcedure, parameters,
-                    commandType: CommandType.StoredProcedure, transaction:_transaction);
-           
+        {
+            _connection.Query<T>(storedProcedure, parameters,
+                commandType: CommandType.StoredProcedure, transaction: _transaction);
+
         }
         public List<T> LoadDataInTransaction<T, U>(string storedProcedure, U parameters)
         {
-           
-                // using dapper to load data 
-                // It means Get the connection to database
-                List<T> rows = _connection.Query<T>(storedProcedure, parameters,
-                    commandType: CommandType.StoredProcedure , transaction:_transaction).ToList();
-                return rows;
-         
+
+            // using dapper to load data 
+            // It means Get the connection to database
+            List<T> rows = _connection.Query<T>(storedProcedure, parameters,
+                commandType: CommandType.StoredProcedure, transaction: _transaction).ToList();
+            return rows;
+
         }
 
         private bool isClosed = false;
-        
+
 
         public void CommitTransaction()
         {
@@ -97,7 +97,7 @@ namespace TRMDataManagerLibrary.Internal.DataAccess
                 {
                     CommitTransaction();
                 }
-                catch 
+                catch
                 {
                     //TODO: Log the issue                   
                 }
